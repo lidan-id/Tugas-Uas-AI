@@ -59,8 +59,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /// Each time to start a speech recognition session
   void _startListening() async {
-    await _speechToText.listen(onResult: _onSpeechResult);
+    await _speechToText.listen(
+      onResult: _onSpeechResult,
+      localeId: _getLocaleId(inputLanguage),
+    );
     setState(() {});
+  }
+
+  /// Get the locale identifier for the given language code
+  String _getLocaleId(String languageCode) {
+    switch (languageCode) {
+      case 'fr':
+        return 'fr_FR';
+      case 'es':
+        return 'es_ES';
+      case 'de':
+        return 'de_DE';
+      case 'id':
+        return 'id_ID';
+      case 'en':
+      default:
+        return 'en_US';
+    }
   }
 
   /// Manually stop the active speech recognition session
