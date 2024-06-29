@@ -15,7 +15,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final GoogleTranslator translator = GoogleTranslator();
   final SpeechToText _speechToText = SpeechToText();
-  // String dropDownButtonValue = 'Inggris';
   bool _speechEnabled = false;
   String _lastWords = '';
   String resultSpeech = '';
@@ -51,13 +50,11 @@ class _MyHomePageState extends State<MyHomePage> {
     _initSpeech();
   }
 
-  /// This has to happen only once per app
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
     setState(() {});
   }
 
-  /// Each time to start a speech recognition session
   void _startListening() async {
     await _speechToText.listen(
       onResult: _onSpeechResult,
@@ -66,27 +63,26 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  /// Get the locale identifier for the given language code
   String _getLocaleId(String languageCode) {
     switch (languageCode) {
+      case 'id':
+        return 'id_ID';
       case 'fr':
         return 'fr_FR';
       case 'es':
         return 'es_ES';
       case 'de':
         return 'de_DE';
-      case 'id':
-        return 'id_ID';
+      case 'ja':
+        return 'ja_JP';
+      case 'ko':
+        return 'ko_KR';
       case 'en':
       default:
         return 'en_US';
     }
   }
 
-  /// Manually stop the active speech recognition session
-  /// Note that there are also timeouts that each platform enforces
-  /// and the SpeechToText plugin supports setting timeouts on the
-  /// listen method.
   void _stopListening() async {
     resultSpeech = _lastWords;
     await _speechToText.stop();
@@ -95,8 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  /// This is the callback that the SpeechToText plugin calls when
-  /// the platform returns recognized words.
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
@@ -112,28 +106,19 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const NamaAplikasi(),
+              const NamaFitur(
+                namaFitur: 'SPEECH RECOGNITION ',
+                ikon: Icons.mic,
+              ),
               bagianInputSpeech(context),
               bagianSelectLanguage(),
-              bagianTranslateOutput(context)
+              bagianTranslateOutput(context),
+              const NamaFitur(
+                  namaFitur: 'TRANSLATE & TTS ', ikon: Icons.g_translate)
             ],
           ),
         ),
       ),
-      // floatingActionButton: AvatarGlow(
-      //   animate: _speechToText.isListening,
-      //   glowColor: Colors.grey,
-      //   child: FloatingActionButton(
-      //     shape:
-      //         RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-      //     onPressed:
-      //         // If not yet listening for speech start, otherwise stop
-      //         _speechToText.isNotListening ? _startListening : _stopListening,
-      //     tooltip: 'Listen',
-      //     child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
-      //   ),
-      // ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -154,11 +139,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: FloatingActionButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100)),
-                    onPressed:
-                        // If not yet listening for speech start, otherwise stop
-                        _speechToText.isNotListening
-                            ? _startListening
-                            : _stopListening,
+                    onPressed: _speechToText.isNotListening
+                        ? _startListening
+                        : _stopListening,
                     tooltip: 'Listen',
                     child: Icon(_speechToText.isNotListening
                         ? Icons.mic_off
@@ -169,15 +152,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 20,
                 ),
                 Text(
-                  // If listening is active show the recognized words
                   _speechToText.isListening
                       ? _lastWords
                       : resultSpeech != ''
                           ? resultSpeech
-                          // If listening isn't active but could be tell the user
-                          // how to start it, otherwise indicate that speech
-                          // recognition is not yet ready or not supported on
-                          // the target device
                           : _speechEnabled
                               ? 'Tap the microphone to start listening...'
                               : 'Speech not available',
@@ -206,7 +184,15 @@ class _MyHomePageState extends State<MyHomePage> {
               inputLanguage = newValue!;
             });
           },
-          items: <String>['en', 'fr', 'es', 'de', 'id']
+          items: <String>[
+            'en',
+            'id',
+            'fr',
+            'es',
+            'de',
+            'ja',
+            'ko',
+          ]
               .map<DropdownMenuItem<String>>(
                   (String value) => DropdownMenuItem<String>(
                         value: value,
@@ -237,11 +223,25 @@ class _MyHomePageState extends State<MyHomePage> {
               if (outputLanguage == "id") {
                 ttsLanguage = "id-ID";
               }
+              if (outputLanguage == "ja") {
+                ttsLanguage = "ja-JP";
+              }
+              if (outputLanguage == "ko") {
+                ttsLanguage = "ko-KR";
+              }
             });
             translateText();
             debugPrint(ttsLanguage);
           },
-          items: <String>['en', 'fr', 'es', 'de', 'id']
+          items: <String>[
+            'en',
+            'id',
+            'fr',
+            'es',
+            'de',
+            'ja',
+            'ko',
+          ]
               .map<DropdownMenuItem<String>>(
                   (String value) => DropdownMenuItem<String>(
                         value: value,
@@ -261,18 +261,6 @@ class _MyHomePageState extends State<MyHomePage> {
         const SizedBox(
           height: 20,
         ),
-        // ElevatedButton(
-        //     style: ElevatedButton.styleFrom(
-        //         foregroundColor: Colors.deepPurpleAccent),
-        //     onPressed: () {
-        //       translateText();
-        //     },
-        //     child: const Text(
-        //       'Translate',
-        //     )),
-        // const SizedBox(
-        //   height: 20,
-        // ),
         Container(
           width: MediaQuery.of(context).size.width,
           height: 250,
@@ -323,10 +311,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class NamaAplikasi extends StatelessWidget {
-  const NamaAplikasi({
-    super.key,
-  });
+class NamaFitur extends StatelessWidget {
+  const NamaFitur({super.key, required this.namaFitur, required this.ikon});
+
+  final String namaFitur;
+  final IconData ikon;
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +325,7 @@ class NamaAplikasi extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Text(
-            'SPEECH RECOGNITION',
+            namaFitur,
             style: TextStyle(
               shadows: const [Shadow(blurRadius: 20, color: Colors.grey)],
               fontWeight: FontWeight.bold,
@@ -346,7 +335,7 @@ class NamaAplikasi extends StatelessWidget {
           ),
         ),
         Icon(
-          Icons.mic,
+          ikon,
           size: 20,
           shadows: const [Shadow(blurRadius: 20, color: Colors.grey)],
           color: Colors.deepPurpleAccent.withOpacity(0.6),
